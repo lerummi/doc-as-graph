@@ -4,12 +4,22 @@ FROM apache/airflow:2.2.3
 
 ENV AIRFLOW_HOME=/opt/airflow
 
-USER root
-RUN apt-get update -qq && apt-get install vim -qqq
-# git gcc g++ -qqq
+ARG DOCKER_DIRECTORY ${DOCKER_DIRECTORY}
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+USER root
+
+RUN apt-get update -qq && \
+    apt-get install vim -qqq && \
+    apt-get install --no-install-recommends -y \
+    build-essential && \
+    apt-get autoremove -yqq --purge && \
+    apt-get clean && \
+    apt-get install -y tesseract-ocr tesseract-ocr-deu && \
+    apt-get install ffmpeg libsm6 libxext6 -y && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt ${AIRFLOW_HOME}/
+COPY ${CODE_DIRECTORY} ${AIRFLOW_HOME}/
 
 # Ref: https://airflow.apache.org/docs/docker-stack/recipes.html
 
@@ -19,6 +29,7 @@ ARG CLOUD_SDK_VERSION=322.0.0
 ENV GCLOUD_HOME=/home/google-cloud-sdk
 
 ENV PATH="${GCLOUD_HOME}/bin/:${PATH}"
+ENV PYTHONPATH="${PYTHONPATH}:${AIRFLOW_HOME}/src/"
 
 RUN DOWNLOAD_URL="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${CLOUD_SDK_VERSION}-linux-x86_64.tar.gz" \
     && TMP_DIR="$(mktemp -d)" \
@@ -33,9 +44,15 @@ RUN DOWNLOAD_URL="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/goo
     && rm -rf "${TMP_DIR}" \
     && gcloud --version
 
-WORKDIR $AIRFLOW_HOME
+COPY ./docker/airflow/scripts/entrypoint.sh ${AIRFLOW_HOME}/entrypoint.sh
 
-COPY scripts scripts
-RUN chmod +x scripts
+RUN chmod +x ${AIRFLOW_HOME}/entrypoint.sh
 
-USER $AIRFLOW_UID
+WORKDIR ${AIRFLOW_HOME}
+
+USER ${AIRFLOW_UID}
+
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+RUN python -m spacy download de_core_news_sm
+RUN python -m spacy download en_core_web_sm

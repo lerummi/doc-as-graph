@@ -9,5 +9,5 @@ class Settings(object):
 
     IMAGES_DOWNLOAD_PATH = os.path.join(
         LOCAL_DATA_PATH,
-        "downloads"
+        "docs"
     )

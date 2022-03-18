@@ -1,0 +1,14 @@
+opencv-python
+pytesseract
+spacy
+apache-airflow
+apache-airflow-providers-google
+scikit-learn
+pandas
+python-dotenv
+pytest
+flake8
+matplotlib
+bing-image-downloader==1.0.4
+ipykernel
+pyarrow
