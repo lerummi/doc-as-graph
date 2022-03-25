@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from scipy.spatial.qhull import Delaunay
 
-from datasdoc.sources import ImageSource
+from .sources import ImageSource
 
 
 savefig_keys = [

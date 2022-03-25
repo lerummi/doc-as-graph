@@ -54,10 +54,12 @@ class TesseractOCR(BaseEstimator, TransformerMixin):
             data = data.pipe(lambda x: x[x["text"].str.count(" ") != \
                                        x["text"].apply(len)])
 
+        data["id"] = range(len(data))
+
         data["x"] = data["left"] + data["width"] / 2
         data["y"] = data["top"] + data["height"] / 2
 
-        data.index = ["-".join([X.name, str(i)]) for i in range(data.shape[0])]
+        data["documentId"] = X.name
 
         return OCRDataFrame(data, image_size=X.shape, name=X.name)
 
@@ -135,7 +137,7 @@ class TriangulationGenerator(BaseEstimator, TransformerMixin):
         # Remove image bounding box from triangulation
         triangulation.simplices = triangulation.simplices[~box_simp]
 
-        triangulation.point_names = X.index
+        triangulation.point_names = X["id"]
 
         return triangulation
 

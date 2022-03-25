@@ -20,30 +20,24 @@ class BingImageProperties:
 class Bing:
     def __init__(
         self, 
-        query, 
-        limit, 
-        output_dir, 
         adult, 
         timeout, 
-        properties=BingImageProperties()
-        ):
+        links_file="/tmp/query.links",
+        properties=BingImageProperties(),
+        search_delimiter=",",
+    ):
 
-        self.query = query
-        self.output_dir = output_dir
+        self.links_file = links_file
         self.adult = adult
         self.properties = properties
+        self.search_delimiter = search_delimiter
 
-        assert type(limit) == int, "limit must be integer"
-        self.limit = limit
         assert type(timeout) == int, "timeout must be integer"
         self.timeout = timeout
 
         self.headers = {
             "User-Agent": "Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:60.0)" "Gecko/20100101 Firefox/60.0"
         }
-
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
 
     def save_image(self, link, file_path):
 
@@ -75,7 +69,10 @@ class Bing:
             file_type
         ])
 
-    def download_image(self, link):
+    def download_image(self, link, output_dir):
+
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
         # Get the image link
         try:
@@ -98,7 +95,7 @@ class Bing:
             self.save_image(
                 link, 
                 os.path.join(
-                    self.output_dir, 
+                    output_dir, 
                     filename
                 )
             )
@@ -114,54 +111,100 @@ class Bing:
              f"[%] Done. Downloaded images from {link}."
         )
 
-    def download_images(self, links):
+    def download_images(self, output_dir):
+
+        if not os.path.exists(self.links_file):
+            raise IOError(
+                f"Need to read url links from file {self.links_file} "
+                "as specified by the appropriate input parameter. "
+                "However, file does not exist!"
+            )
+
+        with open(self.links_file, "r") as links_file:
+            links = links_file.readlines()
+
+        print("Links that have been loaded", links)
 
         for link in links:
-            self.download_image(link)
+            self.download_image(link, output_dir)
 
-    def get_url(self, start_at=None):
+    def get_url(self, query, start_at=None, limit=150):
 
-        query = urllib.parse.quote_plus(self.query)
+        query = urllib.parse.quote_plus(query)
 
         return (
             "https://www.bing.com/images/async?"
             f"q={query}"
-            f"&count={self.limit}"
+            f"&count={limit}"
             f"&first={start_at}"
             f"&adlt={self.adult}"
         )
 
-    def get_links(self, start_at=0):
+    def get_links(
+        self,
+        query,
+        limit=150,
+        start_at=0,
+        save=True
+    ):
 
-        print(
-            "\n\n[!!]Indexing page: {}\n"
-            .format(start_at)
-        )
-        # Parse the page source and download pics
+        limit = int(limit)
 
-        request = urllib.request.Request(
-            self.get_url(start_at=start_at), 
-            None,
-            headers=self.headers
-        )
+        query = query.split(self.search_delimiter)
 
-        response = urllib.request.urlopen(request)
-        html = response.read().decode("utf8")
-        links = re.findall("murl&quot;:&quot;(.*?)&quot;", html)
-        links = [
-            link for link in links 
-            for suffix in self.properties.file_type
-            if link.endswith(suffix)
-        ]
+        links = []
 
-        return links
+        for q in query:
 
-    def run(self, start_at=0):
+            q = q.replace(" ", "")
 
-        links = self.get_links(start_at=start_at)
+            if limit > 150:
+                start_at = 0
+                while start_at < limit:
+                    links_ = self.get_links(
+                        query=q,
+                        limit=min(limit - start_at, 150), 
+                        start_at=start_at,
+                        save=False, 
+                    )
+                    start_at += 150
+                    links += list(set(links_))
 
-        for link in links:
-            self.download_image(link)
+            else:
+
+                print(
+                    "\n\n[!!]Indexing page: {}\n"
+                    .format(start_at)
+                )
+
+                request = urllib.request.Request(
+                    self.get_url(
+                        q, 
+                        start_at=start_at, 
+                        limit=limit
+                    ), 
+                    None,
+                    headers=self.headers
+                )
+
+                response = urllib.request.urlopen(request)
+                html = response.read().decode("utf8")
+                links_ = re.findall("murl&quot;:&quot;(.*?)&quot;", html)
+                links_ = [
+                    link for link in links_ 
+                    for suffix in self.properties.file_type
+                    if link.endswith(suffix)
+                ]
+
+                links += list(set(links_))
+
+        if save:
+            with open(self.links_file, "w") as links_file:
+                for link in links:
+                    links_file.write(link)
+                    links_file.write("\n")
+        else:
+            return links
 
 
 class ImageSource(BaseEstimator, TransformerMixin):

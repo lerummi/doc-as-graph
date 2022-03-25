@@ -1,7 +1,10 @@
+from re import S
 import cv2
+import pandas
+from datetime import datetime
 from sklearn.base import BaseEstimator, TransformerMixin
 
-from .datamodels import ImageArray
+from .datamodels import ImageArray, OCRDataFrame
 
 
 class ImagePreprocessor(BaseEstimator, TransformerMixin):
@@ -54,3 +57,18 @@ class OtsuThreshold(ImagePreprocessor):
         return {"thresh": 0,
                 "maxval": 255,
                 "type": cv2.THRESH_BINARY + cv2.THRESH_OTSU}
+
+
+class AddExecutionDate(BaseEstimator, TransformerMixin):
+
+    def fit(self, X, y=None):
+
+        return S
+
+    def transform(self, X: OCRDataFrame):
+
+        X["execution_date"] = pandas.to_datetime(
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        )
+
+        return X

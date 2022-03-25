@@ -2,17 +2,14 @@ from multiprocessing.sharedctypes import Value
 from sklearn.pipeline import Pipeline
 
 from .sources import ImageSource
-from .preprocessing import OtsuThreshold
-from .feature_extraction import (
-    TesseractOCR,
-    SpacyWordEmbedding
+from .preprocessing import (
+    OtsuThreshold,
+    AddExecutionDate
 )
-from .targets import ParquetWriter
+from .feature_extraction import TesseractOCR
 
-def image_to_table(
-    language="eng+deu", 
-    output_folder="/tmp"
-    ):
+
+def image_to_table(language="eng+deu"):
 
     if language not in ["eng", "deu", "eng+deu"]:
         raise ValueError(
@@ -36,6 +33,5 @@ def image_to_table(
         ("load", ImageSource(gray=True)),
         ("preprocess", OtsuThreshold()),
         ("ocr", TesseractOCR(lang=tesseract_lang)),
-        ("embedding", SpacyWordEmbedding(spacy_model)),
-        ("write", ParquetWriter(output_folder=output_folder))
+        ("date", AddExecutionDate())
     ])

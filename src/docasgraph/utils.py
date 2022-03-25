@@ -1,8 +1,10 @@
+import os
 import numpy as np
 import pandas
 from functools import wraps
 
 from .datamodels import OCRDataFrame
+from .targets import ParquetWriter
 
 
 def rectangle_overlap(X: pandas.DataFrame,
@@ -107,7 +109,6 @@ def batch(function: callable, errors="ignore"):
                         f"Error processing X = {x}:\n"
                         f"{e.__class__.__name__}({str(e)})"
                     )
-                    print(message)
                     out.append(message)
                     continue
             else:
@@ -117,3 +118,67 @@ def batch(function: callable, errors="ignore"):
         return out
 
     return apply_to_batch
+
+
+def io_wrapper(
+    function: callable,
+    errors="ignore"):
+
+    @wraps(function)
+    def apply_to_batch(
+        input_directory,
+        output_directory
+    ):
+
+        for inputfile in os.listdir(input_directory):
+
+            print(f"Processing inputfile {inputfile}...")
+
+            if errors == "ignore":
+                try:
+                    x = os.path.join(
+                        input_directory, 
+                        inputfile
+                    )
+                    single = function(x)
+                except:
+                    continue
+            elif errors == "print":
+                try:
+                    x = os.path.join(
+                        input_directory, 
+                        inputfile
+                    )
+                    single = function(x)
+                except Exception as e:
+                    message = (
+                        f"Error processing X = {x}:\n"
+                        f"{e.__class__.__name__}({str(e)})"
+                    )
+                    continue
+            else:
+                single = function(x)
+
+            ParquetWriter(output_folder=output_directory).transform(single)
+
+    return apply_to_batch
+
+
+def strip_suffix(filename):
+
+    return ".".join(
+        filename.split(".")[:-1]
+    )
+
+
+def remove_surplus_images(table_directory, image_directory):
+
+    table_files = [
+        strip_suffix(file_) for file_ in os.listdir(table_directory)]
+
+    for image_file in os.listdir(image_directory):
+        if strip_suffix(image_file) not in table_files:
+            print(f"Removing image file {image_file}...")
+            os.remove(
+            os.path.join(image_directory, image_file)
+        )
