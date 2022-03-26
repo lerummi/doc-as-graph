@@ -20,7 +20,7 @@ Bing for downloading image sources to the local system.
 
 ### OCR
 
-Downloaded images are OCRed and the text tokens incl. positions are carried out using tesseract. The output is organized in parquet tables.
+Downloaded images are OCRed and the text tokens incl. positions are carried out using [tesseract](https://github.com/tesseract-ocr/tesseract). The output is organized in parquet tables.
 
 ### Data ingestions
 
@@ -37,7 +37,7 @@ From the concatenated data, some simple dashboards are created showing some insi
 ## Prerequisites
 
 Create [Google Cloud account](https://cloud.google.com/docs/authentication/getting-started)
-and place the JSON key file to `~/.gc/google_credentials.json` so you
+and place the JSON key file to `~/.google/credentials/google_credentials.json` so you
 have full compatibility with the paths defined within this project.
 
 ## Getting Started
