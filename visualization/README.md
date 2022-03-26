@@ -1,3 +1,11 @@
+## Create Dashoard
+
+### Prerequisites
+
+You must have applied to transformation as documented [here](../transformations/README.md).
+
+### Google Data Studio
+
 1. Go to [Google Data Studio](https://datastudio.google.com/).
 
 2. Select Google BigQuery Connector, enter `ProjectId=${GCP_PROJECT_ID}`,
