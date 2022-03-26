@@ -54,7 +54,7 @@ class TesseractOCR(BaseEstimator, TransformerMixin):
             data = data.pipe(lambda x: x[x["text"].str.count(" ") != \
                                        x["text"].apply(len)])
 
-        data["id"] = range(len(data))
+        data["id"] = np.arange(len(data))
 
         data["x"] = data["left"] + data["width"] / 2
         data["y"] = data["top"] + data["height"] / 2

@@ -41,7 +41,7 @@ params = {
             "of comma-separated keywords."
     ),
     "max_items": Param(
-        default=100,
+        default=20,
         type="integer", 
         description="Maximum number of items to be downloaded per search key."
     ),
@@ -89,9 +89,28 @@ with DAG(
 
     create_bq_table_query = (
         f"CREATE OR REPLACE TABLE {BIGQUERY_DATASET}"
-        ".{{ params.save_key }}_partitioned " 
+        ".{{ params.save_key }}_partitioned "
+        """(
+        `level` INTEGER, 
+        `page_num` INTEGER, 
+        `block_num` INTEGER, 
+        `par_num` INTEGER, 
+        `line_num` INTEGER, 
+        `word_num` INTEGER,
+        `left` INTEGER, 
+        `top` INTEGER, 
+        `width` INTEGER, 
+        `height` INTEGER, 
+        `conf` INTEGER,
+        `text` STRING, 
+        `id` INTEGER, 
+        `x` FLOAT64,
+        `y` FLOAT64, 
+        `documentId` STRING, 
+        `execution_date` TIMESTAMP,
+        `__index_level_0__` INTEGER) """ 
         "PARTITION BY DATE(execution_date) "
-        "CLUSTER BY id, page_num, block_num AS "
+        "CLUSTER BY documentId, page_num, block_num AS "
         f"SELECT * FROM {BIGQUERY_DATASET}"
         ".{{ params.save_key }}_external"
     )
@@ -166,8 +185,29 @@ with DAG(
             "externalDataConfiguration": {
                 "sourceFormat": "PARQUET",
                 "sourceUris": [f"gs://{BUCKET}/{gcp_tables_folder}/*.parquet"],
-            },
-        },
+                "schema": {"fields": [
+            {"name": "level", "type": "INTEGER", "mode": "required"}, 
+            {"name": "page_num", "type": "INTEGER", "mode": "required"},  
+            {"name": "block_num", "type": "INTEGER", "mode": "required"},  
+            {"name": "par_num", "type": "INTEGER", "mode": "required"},  
+            {"name": "line_num", "type": "INTEGER", "mode": "required"},  
+            {"name": "word_num", "type": "INTEGER", "mode": "required"}, 
+            {"name": "left", "type": "INTEGER", "mode": "required"},  
+            {"name": "top", "type": "INTEGER", "mode": "required"},  
+            {"name": "width", "type": "INTEGER", "mode": "required"},  
+            {"name": "height", "type": "INTEGER", "mode": "required"},  
+            {"name": "conf", "type": "INTEGER", "mode": "required"}, 
+            {"name": "text", "type": "STRING", "mode": "required"},  
+            {"name": "id", "type": "INTEGER", "mode": "required"},  
+            {"name": "x", "type": "FLOAT64", "mode": "required"}, 
+            {"name": "y", "type": "FLOAT64", "mode": "required"},  
+            {"name": "documentId", "type": "STRING", "mode": "required"},  
+            {"name": "execution_date", 
+             "type": "TIMESTAMP", 
+             "mode": "required"}, 
+            {"name": "__index_level_0__", "type": "INTEGER"}]}
+            }
+        }
     )
 
     bq_create_partitioned_table_job = BigQueryInsertJobOperator(
