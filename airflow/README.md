@@ -1,6 +1,7 @@
 # Data crawling and push to cloud using Airflow
 
 The first step of the workflow is to crawl data from Bing and ingest this data into Google Cloud Storage and BigQuery. We utilize Airflow for this procedure.
+Data is not periodically updated, but only running once when manually triggered. The user should always trigger with configuration to obtain new data.
 
 ## Prerequisities
 

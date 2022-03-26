@@ -6,7 +6,7 @@
 ### Prerequisities
 
 In order to be able to utilize terraform for constructing your GC
-infrastructure, create a .env file in the root folder (check the .env.dist as
+infrastructure, create a .env file in the root folder (check the [.env.dist](../.env.dist) as
 template) and at least set the following variables
 
 ```

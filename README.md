@@ -9,7 +9,9 @@ This project, instead, goes back to an idea for understanding how documents are 
 text information including relative positions of known text patterns. Our understanding
 of documents is somewhat like interpreting a visual graph of text patterns.
 
-Here, we aim to provide a data pipeline for creating the a basis for this manner. The following steps are carried out:
+Here, we aim to provide a data pipeline for creating the a basis for this manner: Data is downloaded, OCRed and stored in a data base. From here, there data graphs can be constructed, which is, however, out of scope for the project in the initial stage.
+
+The following steps are carried out:
 
 ### Data Crawling
 
