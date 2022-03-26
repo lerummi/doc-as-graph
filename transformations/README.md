@@ -167,6 +167,10 @@ Test that writing works as well:
 df.write.parquet('zones')
 ```
 
+### Create data in BigQuery
+
+In order to have data available for usage, ingest data to BigQuery following [this guide](../airflow.README.md).
+
 ## Create virtual environment and start jupyter-lab
 
 To start, create a virtual environment in the root directory

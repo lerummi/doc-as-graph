@@ -7,12 +7,12 @@ Data is not periodically updated, but only running once when manually triggered.
 
 To be able to carry out the following steps, first
 
-- Follow the **Prerequisies** stated in the project root directory and
-- User **terraform** (parallel directory) to build your cloud environment if not available.
+- Follow the [**Prerequisies**](../README.md) stated in the project root directory and
+- Use [**terraform**](../terraform/README.md) to build your cloud environment if not available.
 
 ## Start Airflow Webserver
 
-Use the provided docker-compose file in the project root directory to build and run airflow. Environmental variables should be fine, when specified in the `.env` file.
+Use the provided docker-compose file in the project root directory to build and run airflow. Environmental variables should be fine, when specified in the [`.env`](../.env) file.
 
 ```
 ../docker-compose up --build
