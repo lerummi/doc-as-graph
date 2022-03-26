@@ -1,6 +1,7 @@
-locals {
-  data_lake_bucket = "doc_as_graph"
+variable "bucket" {
+  description = "Name of GCP Bucket used as data lake"
 }
+
 
 variable "project" {
   description = "Your GCP Project ID"

@@ -13,13 +13,24 @@ template) and at least set the following variables
 GCP_PROJECT_ID=
 GCP_GCS_BUCKET=
 BIGQUERY_DATASET=
+
+TF_VAR_region=  # GC region
+TF_VAR_project=  # Same as GCP_PROJECT_ID, however, can not be inherited from variable above
+TF_VAR_BQ_DATASET=  # Same as BIGQUERY_DATASET, however, can not be inherited from variable above
+TF_VAR_bucket=  # Same as BIGQUERY_DATASET, however, can not be inherited from variable above
+```
+
+To read from the file, within your terminal run the script
+
+```
+source ./read_dotenv.sh
 ```
 
 ### Execution
 
 ```shell
 # Refresh service-account's auth-token for this session
-gcloud auth application-default login
+gcloud auth application-default login &
 
 # Initialize state file (.tfstate)
 terraform init

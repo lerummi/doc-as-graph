@@ -6,10 +6,10 @@ text.
 Nowadays, also multi-modal evaluation will become a standard, using image and text information in a combined manner. However, still text and visual information is separated from each other, meaning the associated features are isolated.
 
 This project, instead, goes back to an idea for understanding how documents are understood by humans: We analyze the visual information accompanied with the
-text information including relative positions of known text patterns. Our understanding
+text information including relative positions of known text patterns at once, rather than understanding the visual + text information separately and then combining this information like multi-model evaluation does. Our understanding
 of documents is somewhat like interpreting a visual graph of text patterns.
 
-Here, we aim to provide a data pipeline for creating the a basis for this manner: Data is downloaded, OCRed and stored in a data base. From here, there data graphs can be constructed, which is, however, out of scope for the project in the initial stage.
+Here, we aim to provide a data pipeline for creating the a basis for this manner: Data is downloaded, OCRed and stored in a data base. From here, there data graphs for training can be constructed, which is, however, out of scope for the project in the initial stage.
 
 The following steps are carried out:
 
